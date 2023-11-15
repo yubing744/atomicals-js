@@ -15,7 +15,6 @@ import { detectScriptToAddressType } from "./address-helpers";
 import { ATOMICALS_PROTOCOL_ENVELOPE_ID } from '../types/protocol-tags';
 import { BASE_REQUEST_OPTS_DEFAULTS, BaseRequestOptions } from '../interfaces/api.interface';
 import * as CrockfordBase32 from 'crockford-base32';
-import { fileWriter } from './file-utils';
 const mintnft = 'nft';
 const mintft = 'ft';
 const mintdft = 'dft';
@@ -74,7 +73,7 @@ export const encodeHashToBuffer = (v) => {
   return Buffer.from(v, 'hex');
 }
 
-export const encodeIds = (jsonObject, updatedObject, encodingFunc, autoEncodePattern?: string) => {
+export const encodeIds = (jsonObject, updatedObject, atomicalIdEncodingFunc, otherEncodingFunc, autoEncodePattern?: string) => {
   if (!isObject(jsonObject)) {
     return;
   }
@@ -83,12 +82,12 @@ export const encodeIds = (jsonObject, updatedObject, encodingFunc, autoEncodePat
       continue;
     }
     if (prop === 'id' && isAtomicalId(jsonObject['id'])) {
-      updatedObject[prop] = encodingFunc(jsonObject['id'])
+      updatedObject[prop] = atomicalIdEncodingFunc(jsonObject['id'])
     } else if (autoEncodePattern && prop.endsWith(autoEncodePattern)) {
-      updatedObject[prop] = encodingFunc(jsonObject[prop])
+      updatedObject[prop] = otherEncodingFunc(jsonObject[prop])
     } else {
       updatedObject[prop] = jsonObject[prop]
-      encodeIds(jsonObject[prop], updatedObject[prop], encodingFunc, autoEncodePattern)
+      encodeIds(jsonObject[prop], updatedObject[prop], atomicalIdEncodingFunc, otherEncodingFunc, autoEncodePattern)
     }
   }
   return updatedObject;
@@ -411,7 +410,9 @@ export const isValidBitworkMinimum = (bitworkc: any) => {
     throw new Error('Require at least --bitworkc with 4 hex digits or 3 ascii digits.')
   }
 }
-
+export const isValidBitworkConst = (bitwork_val: any): boolean => {
+  return bitwork_val === 'any';
+}
 export const isValidBitworkString = (fullstring, safety = true): BitworkInfo | null => {
   if (!fullstring) {
     throw new Error(errMessage);
@@ -501,6 +502,14 @@ export const isValidNameBase = (name: string, isTLR = false) => {
     if (name[0] >= '0' && name[0] <= '9') {
       throw new Error('Top level realm name cannot start with a number');
     }
+  }
+  return true;
+}
+
+export const isValidDmitemName = (name: string) => {
+  isValidNameBase(name);
+  if (!/^[a-z0-9][a-z0-9\-]{0,63}$/.test(name)) {
+    throw new Error('Invalid dmitem name: ' + name);
   }
   return true;
 }
