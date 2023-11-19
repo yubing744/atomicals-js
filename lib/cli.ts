@@ -323,8 +323,26 @@ program.command('address')
       const atomicals = new Atomicals(ElectrumApi.createClient(process.env.ELECTRUMX_PROXY_BASE_URL || ''));
       const receive: { output: any, address: string } = performAddressAliasReplacement(walletInfo, address || undefined);
       const result: any = await atomicals.addressInfo(receive.address, history);
-      qrcode.generate(result.data?.address, { small: false });
+      //qrcode.generate(result.data?.address, { small: false });
       handleResultLogging(result);
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
+program.command('address-unconfirmed-count')
+  .description('Get balances and Atomicals unconfirmed count stored at an address')
+  .argument('<address>', 'string')
+  .option('--history', 'Verbose output to include history or not')
+  .action(async (address, options) => {
+    try {
+      const walletInfo = await validateWalletStorage();
+      const history = options.history ? true : false;
+      const config: ConfigurationInterface = validateCliInputs();
+      const atomicals = new Atomicals(ElectrumApi.createClient(process.env.ELECTRUMX_PROXY_BASE_URL || ''));
+      const receive: { output: any, address: string } = performAddressAliasReplacement(walletInfo, address || undefined);
+      const result: any = await atomicals.addressInfo(receive.address, history);
+      console.log("unconfirmed:", result.data.globalBalanceInfo.unconfirmed)
     } catch (error) {
       console.log(error);
     }

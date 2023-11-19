@@ -11,7 +11,9 @@
     "cli": "node dist/cli.js",
     "test": "mocha --timeout=30000 --reporter spec \"test/**/*.test.js\"",
     "e2e": "mocha --grep e2e  --timeout=300000 --reporter spec",
-    "mint-atommap": "yarn cli mint-nft ./Atom-map/89889.atommap.svg --satsbyte 38 --satsoutput 546 --bitworkc ab89889"
+    "mint-atommap": "yarn cli mint-nft ./Atom-map/89889.atommap.svg --satsbyte 38 --satsoutput 546 --bitworkc ab89889",
+    "mint-bitvm": "yarn cli mint-dft bitvm --satsbyte 80",
+    "mint-realm": "yarn cli mint-realm neurai --satsbyte 80"
   },
   "repository": {
     "type": "git",
