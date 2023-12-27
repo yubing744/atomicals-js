@@ -28,6 +28,7 @@ SOFTWARE.
 import { ElectrumApiInterface } from "../api/electrum-api.interface";
 import { KeyPairInfo, getKeypairInfo } from "./address-keypair-path";
 import * as os from "os";
+import * as path from 'path';
 import {
     BitworkInfo,
     hasValidBitwork,
@@ -716,7 +717,8 @@ export class AtomicalOperationBuilder {
         // Initialize and start worker threads
         for (let i = 0; i < concurrency; i++) {
             console.log("Initializing worker: " + i);
-            const worker = new Worker("./dist/utils/miner-worker.js");
+            const libBasePath = process.env.ATOMICALS_LIB_PATH || '.'
+            const worker = new Worker(path.join(libBasePath, "./dist/utils/miner-worker.js"));
 
             // Handle messages from workers
             worker.on("message", (message: WorkerOut) => {
